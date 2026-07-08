@@ -5,17 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
-    private UUID id;
+public class AuthResponse {
+    private String token;
+    private String tokenType;
+    private long expiresInMs;
+    private UUID userId;
     private String email;
     private String name;
-    private OffsetDateTime createdAt;
-    private String message;
 }

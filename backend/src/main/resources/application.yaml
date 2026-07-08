@@ -37,4 +37,7 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
 
-
+app:
+  jwt:
+    secret: "your-super-secret-key-change-me-in-production-min-32-chars-long-value" #TODO в продакшене генерроть случайный
+    expiration-ms: 86400000

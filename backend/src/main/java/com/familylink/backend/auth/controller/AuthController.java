@@ -1,7 +1,8 @@
 package com.familylink.backend.auth.controller;
 
+import com.familylink.backend.auth.dto.AuthResponse;
+import com.familylink.backend.auth.dto.LoginRequest;
 import com.familylink.backend.auth.dto.RegisterRequest;
-import com.familylink.backend.auth.dto.RegisterResponse;
 import com.familylink.backend.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,8 +25,15 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Регистрация нового пользователя")
-    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-        RegisterResponse response = authService.register(request);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "Вход пользователя")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }
