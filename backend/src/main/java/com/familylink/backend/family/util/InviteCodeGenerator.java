@@ -1,0 +1,24 @@
+package com.familylink.backend.family.util;
+
+import org.springframework.stereotype.Component;
+
+import java.security.SecureRandom;
+
+@Component
+public class InviteCodeGenerator {
+
+    // Без похожих символов: 0/O, 1/I/L
+    private static final String ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    private static final int CODE_LENGTH = 6;
+    private static final String PREFIX = "FAM-";
+
+    private final SecureRandom random = new SecureRandom();
+
+    public String generate() {
+        StringBuilder sb = new StringBuilder(PREFIX);
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            sb.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+        }
+        return sb.toString();
+    }
+}

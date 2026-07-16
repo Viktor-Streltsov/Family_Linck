@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -34,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
+        // Нет заголовка или он не в формате Bearer — просто пропускаем дальше
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -42,31 +45,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
-            if (!jwtService.isTokenValid(token)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+            if (jwtService.isTokenValid(token)) {
+                String email = jwtService.extractEmail(token);
+                Optional<User> userOpt = userRepository.findByEmail(email);
 
-            String email = jwtService.extractEmail(token);
-            Optional<User> userOpt = userRepository.findByEmail(email);
+                if (userOpt.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    User user = userOpt.get();
 
-            if (userOpt.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User user = userOpt.get();
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    Collections.emptyList()
+                            );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                Collections.emptyList()
-                        );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         } catch (Exception e) {
+            // Токен невалиден или истёк — просто логируем и продолжаем без авторизации
+            log.debug("Invalid JWT token: {}", e.getMessage());
             SecurityContextHolder.clearContext();
         }
 
+        // ВСЕГДА идём дальше по цепочке фильтров
         filterChain.doFilter(request, response);
     }
 }
