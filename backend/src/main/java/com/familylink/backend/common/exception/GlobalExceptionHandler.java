@@ -2,6 +2,7 @@ package com.familylink.backend.common.exception;
 
 import com.familylink.backend.auth.exception.EmailAlreadyExistsException;
 import com.familylink.backend.auth.exception.InvalidCredentialsException;
+import com.familylink.backend.consent.exception.ConsentRequiredException;
 import com.familylink.backend.family.exception.AlreadyMemberException;
 import com.familylink.backend.family.exception.FamilyNotFoundException;
 import com.familylink.backend.family.exception.NotFamilyMemberException;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@RestControllerAdvice   // ← ВОТ ЭТА СТРОКА
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -84,6 +85,17 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.builder()
                 .status(HttpStatus.FORBIDDEN.value())
                 .error("Forbidden")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(ConsentRequiredException.class)
+    public ResponseEntity<ErrorResponse> handleConsentRequired(ConsentRequiredException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Consent Required")
                 .message(ex.getMessage())
                 .timestamp(OffsetDateTime.now())
                 .build();

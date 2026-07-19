@@ -31,9 +31,9 @@ CREATE TABLE mood_entries (
             'TIRED',
             'SAD',
             'ANGRY',
-            'ANXIOUS',
+            'ANXIOUS'
         ))
-)
+);
 
 CREATE INDEX idx_mood_entries_user ON mood_entries(user_id);
 CREATE INDEX idx_mood_entries_family ON mood_entries(family_id);
