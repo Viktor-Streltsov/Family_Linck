@@ -11,6 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.familylink.backend.situation.exception.NotSituationParticipantException;
+import com.familylink.backend.situation.exception.RecommendationNotReadyException;
+import com.familylink.backend.situation.exception.SituationNotFoundException;
+import com.familylink.backend.situation.exception.SelfDialogueException;
+import com.familylink.backend.situation.exception.SameRoleParticipantsException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -100,6 +105,61 @@ public class GlobalExceptionHandler {
                 .timestamp(OffsetDateTime.now())
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(SituationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSituationNotFound(SituationNotFoundException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .error("Not Found")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(NotSituationParticipantException.class)
+    public ResponseEntity<ErrorResponse> handleNotSituationParticipant(NotSituationParticipantException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .error("Forbidden")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(RecommendationNotReadyException.class)
+    public ResponseEntity<ErrorResponse> handleRecommendationNotReady(RecommendationNotReadyException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(SelfDialogueException.class)
+    public ResponseEntity<ErrorResponse> handleSelfDialogue(SelfDialogueException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(SameRoleParticipantsException.class)
+    public ResponseEntity<ErrorResponse> handleSameRole(SameRoleParticipantsException ex) {
+        ErrorResponse response = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(ex.getMessage())
+                .timestamp(OffsetDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(Exception.class)
